@@ -13,7 +13,7 @@ const FloorPlanSchema = new Schema({
         trim: true
     },
     date: {
-        type: Date,
+        type: String,
        
     },
     images: {
@@ -39,7 +39,7 @@ const InteriorDesignSchema = new Schema({
         trim: true
     },
     date: {
-        type: Date,
+        type: String,
        
     },
     images: {
@@ -64,7 +64,7 @@ const ProjectMHQSchema = new Schema({
         trim: true
     },
     date: {
-        type: Date,
+        type: String,
        
     },
     images: {
@@ -90,7 +90,7 @@ const visualization3DSchema = new Schema({
         trim: true
     },
     date: {
-        type: Date,
+        type: String,
        
     },
     images: {
@@ -101,15 +101,15 @@ const visualization3DSchema = new Schema({
     timestamps: true 
 });
 
-const floorPlans = mongoose.model('floorPlans', FloorPlanSchema);
+const FloorPlans = mongoose.model('floorPlans', FloorPlanSchema);
 const InteriorDesign = mongoose.model('interiorDesign', InteriorDesignSchema);
-const ProjectMHQ = mongoose.model('MHQ', ProjectMHQSchema);
-const visualization3D = mongoose.model('Project', visualization3DSchema);
+const ProjectMHQ = mongoose.model('MHQproject', ProjectMHQSchema);
+const Visualization3D = mongoose.model('visualization', visualization3DSchema);
 
 module.exports = {
-   floorPlans ,
+   FloorPlans ,
    InteriorDesign,
    ProjectMHQ,
-   visualization3D,
+   Visualization3D,
 
 }

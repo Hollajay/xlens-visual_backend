@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose")
+const projectRoutes = require("./Routes/projectRoutes")
 const App = express();
 const PORT = 5000;
 require("dotenv").config()
@@ -15,7 +16,7 @@ App.use(express.urlencoded({extended:true}))
 App.use(express.json())
 
 
-
+App.use("/api/projects", projectRoutes);
 
 
 
