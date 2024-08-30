@@ -1,16 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllFloorPlans, createFloorPlan, updateFloorPlan, deleteFloorPlan } = require("../controller/projectController/FloorPlansController");
+
+const upload = require("../middleware/multer")
+
+
+
+
+
+
+const { getAllFloorPlans,  updateFloorPlan, deleteFloorPlan, createFloorPlan } = require("../controller/projectController/FloorPlansController");
 const { getAllInteriorDesigns, createInteriorDesign, updateInteriorDesign, deleteInteriorDesign } = require("../controller/projectController/interiorDesignContoller");
 const { getAllMHQProjects, createMHQProject, updateMHQProject, deleteMHQProject } = require("../controller/projectController/projectMHQController");
 const { getAllVisualization3Ds, createVisualization3D, updateVisualization3D, deleteVisualization3D } = require("../controller/projectController/visualization3DController");
 
+
 // FloorPlans routes
 router.get("/floorplans", getAllFloorPlans);
-router.post("/floorplans", createFloorPlan);
-router.put("/floorplans", updateFloorPlan);
-router.delete("/floorplans",deleteFloorPlan)
+router.post("/floorplans", upload,createFloorPlan);
+router.put("/floorplans/:id", updateFloorPlan);
+router.delete("/floorplans/:id",deleteFloorPlan)
 
 
 // InteriorDesign routes

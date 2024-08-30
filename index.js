@@ -21,7 +21,10 @@ App.use("/api/projects", projectRoutes);
 
 
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URL,{
+
+  serverSelectionTimeoutMS: 50000
+})
  .then(
     App.listen(PORT , () => {
         console.log(`connected to mongoose`);
