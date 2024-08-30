@@ -1,20 +1,26 @@
 const express = require("express");
 const mongoose = require("mongoose")
 const projectRoutes = require("./Routes/projectRoutes")
+const cors = require('cors');
 const App = express();
 const PORT = 5000;
 require("dotenv").config()
 
 
-
-
-App.get("/", (req,res)=>{
-    res.send("server home page")
-})
-
 App.use(express.urlencoded({extended:true}))
 App.use(express.json())
 
+App.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+  }));
+
+
+
+  App.get("/", (req,res)=>{
+    res.send("server home page")
+})
 
 App.use("/api/projects", projectRoutes);
 
