@@ -24,21 +24,21 @@ router.delete("/floorplans/:id",deleteFloorPlan)
 
 // InteriorDesign routes
 router.get("/interiordesigns", getAllInteriorDesigns);
-router.post("/interiordesigns", createInteriorDesign);
-router.put("/interiordesigns",updateInteriorDesign);
-router.delete("/interiordesigns",deleteInteriorDesign)
+router.post("/interiordesigns",upload, createInteriorDesign);
+router.put("/interiordesigns/:id",updateInteriorDesign);
+router.delete("/interiordesigns/:id",deleteInteriorDesign)
 
 // ProjectMHQ routes
 router.get("/mhqprojects", getAllMHQProjects);
-router.post("/mhqprojects", createMHQProject);
-router.put("/mhqprojects", updateMHQProject);
-router.delete("/mhqprojects",deleteMHQProject)
+router.post("/mhqprojects",upload, createMHQProject);
+router.put("/mhqprojects/:id", updateMHQProject);
+router.delete("/mhqprojects/:id",deleteMHQProject)
 
 
 // Visualization3D routes
 router.get("/visualizations", getAllVisualization3Ds);
-router.post("/visualizations", createVisualization3D);
-router.put("/visualizations", updateVisualization3D);
-router.delete("/visualizations",deleteVisualization3D)
+router.post("/visualizations",upload, createVisualization3D);
+router.put("/visualizations/:id", updateVisualization3D);
+router.delete("/visualizations/:id",deleteVisualization3D)
 
 module.exports = router;

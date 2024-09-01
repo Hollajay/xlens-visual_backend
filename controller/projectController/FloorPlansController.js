@@ -15,6 +15,8 @@ const getAllFloorPlans = async (req, res) => {
 
 const createFloorPlan = async (req, res) => {
     try {
+        console.log(req.files);
+        
         // Compress and upload each file to Cloudinary
         const uploadResults = await Promise.all(req.files.map(async (file) => {
             const compressedImagePath = file.path + "-compressed.jpg";
