@@ -1,8 +1,20 @@
 const Visualization3D = require("../../Models/projectModel").Visualization3D;
-const upload = require("../../middleware/multer");
 const cloudinary = require("../../Utils/cloudinary");
 const sharp = require("sharp");
+const { encode } = require("blurhash");
 
+// Function to generate Blurhash
+const generateBlurhash = async (imagePath) => {
+    const image = await sharp(imagePath).raw().ensureAlpha().resize(32, 32, {
+        fit: 'inside'
+    }).toBuffer({ resolveWithObject: true });
+
+    const { data, info } = image;
+    const blurhash = encode(new Uint8ClampedArray(data), info.width, info.height, 4, 4);
+    return blurhash;
+};
+
+// Get all 3D Visualizations
 const getAllVisualization3Ds = async (req, res) => {
     try {
         const visualization3Ds = await Visualization3D.find();
@@ -12,6 +24,7 @@ const getAllVisualization3Ds = async (req, res) => {
     }
 };
 
+// Create a new 3D Visualization
 const createVisualization3D = async (req, res) => {
     try {
         // Compress and upload each file to Cloudinary
@@ -22,6 +35,9 @@ const createVisualization3D = async (req, res) => {
                 .jpeg({ quality: 70 })   // Compress to 70% quality
                 .toFile(compressedImagePath);
 
+            // Generate Blurhash
+            const blurhash = await generateBlurhash(file.path);
+
             const result = await cloudinary.uploader.upload(compressedImagePath, {
                 folder: "visualization3Ds",
                 use_filename: true,
@@ -31,16 +47,19 @@ const createVisualization3D = async (req, res) => {
 
             return {
                 url: result.secure_url,
-                cloudinary_id: result.public_id
+                cloudinary_id: result.public_id,
+                blurhash: blurhash // Include blurhash in the result
             };
         }));
 
-        // Create a new 3D visualization document
+        // Create a new 3D Visualization document
         let newVisualization3D = new Visualization3D({
             designName: req.body.designName,
             location: req.body.location,
             date: req.body.date,
-            images: uploadResults
+            images: uploadResults,
+            timeframe: req.body.timeframe,
+            pricerange: req.body.pricerange,
         });
 
         // Save the document to the database
@@ -54,9 +73,10 @@ const createVisualization3D = async (req, res) => {
     }
 };
 
+// Update an existing 3D Visualization
 const updateVisualization3D = async (req, res) => {
     const { id } = req.params;
-    const { designName, location, date } = req.body;
+    const { designName, location, date , timeframe, pricerange} = req.body;
 
     try {
         console.log(`Updating 3D visualization with ID: ${id}`);
@@ -86,6 +106,9 @@ const updateVisualization3D = async (req, res) => {
                     .jpeg({ quality: 70 })   // Compress to 70% quality
                     .toFile(compressedImagePath);
 
+                // Generate Blurhash
+                const blurhash = await generateBlurhash(file.path);
+
                 // Upload compressed image to Cloudinary
                 const result = await cloudinary.uploader.upload(compressedImagePath, {
                     folder: "visualization3Ds",
@@ -96,7 +119,8 @@ const updateVisualization3D = async (req, res) => {
 
                 return {
                     url: result.secure_url,
-                    cloudinary_id: result.public_id
+                    cloudinary_id: result.public_id,
+                    blurhash: blurhash // Include blurhash in the result
                 };
             }));
 
@@ -108,6 +132,8 @@ const updateVisualization3D = async (req, res) => {
         visualization3D.designName = designName || visualization3D.designName;
         visualization3D.location = location || visualization3D.location;
         visualization3D.date = date || visualization3D.date;
+        visualization3D.timeframe = timeframe || visualization3D.timeframe;
+        visualization3D.pricerange = pricerange || visualization3D.pricerange
 
         // Save the updated 3D visualization to the database
         const updatedVisualization3D = await visualization3D.save();
@@ -120,6 +146,7 @@ const updateVisualization3D = async (req, res) => {
     }
 };
 
+// Delete a 3D Visualization
 const deleteVisualization3D = async (req, res) => {
     const { id } = req.params;
     console.log(`Deleting 3D visualization with ID: ${id}`);
@@ -133,11 +160,11 @@ const deleteVisualization3D = async (req, res) => {
             return res.status(404).json({ message: '3D visualization not found' });
         }
 
-        // Check if cloudinary_id exists before attempting to delete the image
-        if (visualization3D.cloudinary_id) {
-            await cloudinary.uploader.destroy(visualization3D.cloudinary_id);
-        } else {
-            console.warn(`No cloudinary_id found for 3D visualization with ID: ${id}`);
+        // Delete existing images from Cloudinary
+        if (visualization3D.images && visualization3D.images.length > 0) {
+            await Promise.all(visualization3D.images.map(async (image) => {
+                await cloudinary.uploader.destroy(image.cloudinary_id);
+            }));
         }
 
         // Delete the 3D visualization from the database

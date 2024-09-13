@@ -19,6 +19,14 @@ const FloorPlanSchema = new Schema({
     images: {
         type: Object, 
         
+    },
+    timeframe:{
+        type: String,
+        trim: true
+    },
+    pricerange:{
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true 
@@ -45,6 +53,14 @@ const InteriorDesignSchema = new Schema({
     images: {
         type: Object, 
         
+    },
+    timeframe:{
+        type: String,
+        trim: true
+    },
+    pricerange:{
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true 
@@ -70,6 +86,14 @@ const ProjectMHQSchema = new Schema({
     images: {
         type: Object, 
         
+    },
+    timeframe:{
+        type: String,
+        trim: true
+    },
+    pricerange:{
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true 
@@ -96,6 +120,14 @@ const visualization3DSchema = new Schema({
     images: {
         type: Object, 
         
+    },
+    timeframe:{
+        type: String,
+        trim: true
+    },
+    pricerange:{
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true 

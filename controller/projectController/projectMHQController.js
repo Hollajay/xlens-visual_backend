@@ -1,7 +1,20 @@
 const ProjectMHQ = require("../../Models/projectModel").ProjectMHQ;
 const cloudinary = require("../../Utils/cloudinary");
 const sharp = require("sharp");
+const { encode } = require("blurhash");
 
+// Function to generate Blurhash
+const generateBlurhash = async (imagePath) => {
+    const image = await sharp(imagePath).raw().ensureAlpha().resize(32, 32, {
+        fit: 'inside'
+    }).toBuffer({ resolveWithObject: true });
+
+    const { data, info } = image;
+    const blurhash = encode(new Uint8ClampedArray(data), info.width, info.height, 4, 4);
+    return blurhash;
+};
+
+// Get all MHQ projects
 const getAllMHQProjects = async (req, res) => {
     try {
         const mhqProjects = await ProjectMHQ.find();
@@ -11,6 +24,7 @@ const getAllMHQProjects = async (req, res) => {
     }
 };
 
+// Create a new MHQ project
 const createMHQProject = async (req, res) => {
     console.log("Received request body:", req.body);
     try {
@@ -22,6 +36,9 @@ const createMHQProject = async (req, res) => {
                 .jpeg({ quality: 70 })   // Compress to 70% quality
                 .toFile(compressedImagePath);
 
+            // Generate Blurhash
+            const blurhash = await generateBlurhash(file.path);
+
             const result = await cloudinary.uploader.upload(compressedImagePath, {
                 folder: "mhqProjects",
                 use_filename: true,
@@ -31,7 +48,8 @@ const createMHQProject = async (req, res) => {
 
             return {
                 url: result.secure_url,
-                cloudinary_id: result.public_id
+                cloudinary_id: result.public_id,
+                blurhash: blurhash // Include blurhash in the result
             };
         }));
 
@@ -40,7 +58,9 @@ const createMHQProject = async (req, res) => {
             designName: req.body.designName,
             location: req.body.location,
             date: req.body.date,
-            images: uploadResults
+            images: uploadResults,
+            timeframe: req.body.timeframe,
+            pricerange: req.body.pricerange,
         });
 
         // Save the document to the database
@@ -54,9 +74,10 @@ const createMHQProject = async (req, res) => {
     }
 };
 
+// Update an existing MHQ project
 const updateMHQProject = async (req, res) => {
     const { id } = req.params;
-    const { projectName, location, date } = req.body;
+    const { designName, location, date , timeframe, pricerange} = req.body;
 
     try {
         console.log(`Updating MHQ project with ID: ${id}`);
@@ -85,6 +106,9 @@ const updateMHQProject = async (req, res) => {
                     .jpeg({ quality: 70 })   // Compress to 70% quality
                     .toFile(compressedImagePath);
 
+                // Generate Blurhash
+                const blurhash = await generateBlurhash(file.path);
+
                 const result = await cloudinary.uploader.upload(compressedImagePath, {
                     folder: "mhqProjects",
                     use_filename: true,
@@ -94,7 +118,8 @@ const updateMHQProject = async (req, res) => {
 
                 return {
                     url: result.secure_url,
-                    cloudinary_id: result.public_id
+                    cloudinary_id: result.public_id,
+                    blurhash: blurhash // Include blurhash in the result
                 };
             }));
 
@@ -103,9 +128,11 @@ const updateMHQProject = async (req, res) => {
         }
 
         // Update other fields
-        mhqProject.projectName = projectName || mhqProject.projectName;
+        mhqProject.designName = designName || mhqProject.designName;
         mhqProject.location = location || mhqProject.location;
         mhqProject.date = date || mhqProject.date;
+        mhqProject.timeframe = timeframe || mhqProject.timeframe;
+        mhqProject.pricerange = pricerange || mhqProject.pricerange;
 
         // Save the updated MHQ project to the database
         const updatedMHQProject = await mhqProject.save();
@@ -118,6 +145,7 @@ const updateMHQProject = async (req, res) => {
     }
 };
 
+// Delete an MHQ project
 const deleteMHQProject = async (req, res) => {
     const { id } = req.params;
     console.log(`Deleting MHQ project with ID: ${id}`);
@@ -131,11 +159,11 @@ const deleteMHQProject = async (req, res) => {
             return res.status(404).json({ message: 'MHQ project not found' });
         }
            
-        // Check if cloudinary_id exists before attempting to delete the image
-        if (mhqProject.cloudinary_id) {
-            await cloudinary.uploader.destroy(mhqProject.cloudinary_id);
-        } else {
-            console.warn(`No cloudinary_id found for MHQ project with ID: ${id}`);
+        // Delete existing images from Cloudinary
+        if (mhqProject.images && mhqProject.images.length > 0) {
+            await Promise.all(mhqProject.images.map(async (image) => {
+                await cloudinary.uploader.destroy(image.cloudinary_id);
+            }));
         }
 
         // Delete the MHQ project from the database
