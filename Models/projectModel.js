@@ -13,8 +13,7 @@ const FloorPlanSchema = new Schema({
         trim: true
     },
     date: {
-        type: String,
-       
+        type: Date, 
     },
     images: {
         type: Object, 
@@ -47,8 +46,7 @@ const InteriorDesignSchema = new Schema({
         trim: true
     },
     date: {
-        type: String,
-       
+        type: Date, 
     },
     images: {
         type: Object, 
@@ -80,7 +78,7 @@ const ProjectMHQSchema = new Schema({
         trim: true
     },
     date: {
-        type: String,
+        type: Date,
        
     },
     images: {
@@ -114,8 +112,7 @@ const visualization3DSchema = new Schema({
         trim: true
     },
     date: {
-        type: String,
-       
+        type: Date, 
     },
     images: {
         type: Object, 
