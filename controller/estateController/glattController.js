@@ -1,4 +1,4 @@
-const InteriorDesign = require("../../Models/projectModel").InteriorDesign;
+const GlattEstate = require("../../Models/estateModels").Glatt;
 const cloudinary = require("../../Utils/cloudinary");
 const sharp = require("sharp");
 const { encode } = require("blurhash");
@@ -14,18 +14,18 @@ const generateBlurhash = async (imagePath) => {
     return blurhash;
 };
 
-// Get all interior designs
-const getAllInteriorDesigns = async (req, res) => {
+// Get all Glatt designs
+const getAllGlattDesigns = async (req, res) => {
     try {
-        const interiorDesigns = await InteriorDesign.find();
-        res.status(200).json(interiorDesigns);
+        const glattDesigns = await GlattEstate.find();
+        res.status(200).json(glattDesigns);
     } catch (error) {
-        res.status(500).json({ message: 'An error occurred while fetching interior designs', error: error.message });
+        res.status(500).json({ message: 'An error occurred while fetching Glatt designs', error: error.message });
     }
 };
 
-// Create a new interior design
-const createInteriorDesign = async (req, res) => {
+// Create a new Glatt design
+const createGlattDesign = async (req, res) => {
     try {
         // Compress and upload each file to Cloudinary
         console.log(req.files);
@@ -44,7 +44,7 @@ const createInteriorDesign = async (req, res) => {
 
             // Upload the compressed image to Cloudinary
             const result = await cloudinary.uploader.upload(compressedImagePath, {
-                folder: "interiorDesign",
+                folder: "glattDesign",
                 use_filename: true,
                 unique_filename: false,
                 timeout: 180000
@@ -57,8 +57,8 @@ const createInteriorDesign = async (req, res) => {
             };
         }));
 
-        // Create a new interior design document
-        let newInteriorDesign = new InteriorDesign({
+        // Create a new Glatt design document
+        let newGlattDesign = new GlattEstate({
             designName: req.body.designName,
             location: req.body.location,
             date: req.body.date,
@@ -68,9 +68,9 @@ const createInteriorDesign = async (req, res) => {
         });
 
         // Save the document to the database
-        await newInteriorDesign.save();
-        res.status(200).json(newInteriorDesign);
-        console.log(newInteriorDesign);
+        await newGlattDesign.save();
+        res.status(200).json(newGlattDesign);
+        console.log(newGlattDesign);
 
     } catch (error) {
         console.error("Error uploading to Cloudinary:", error);
@@ -78,25 +78,25 @@ const createInteriorDesign = async (req, res) => {
     }
 };
 
-// Update an existing interior design
-const updateInteriorDesign = async (req, res) => {
+// Update an existing Glatt design
+const updateGlattDesign = async (req, res) => {
     const { id } = req.params;
-    const { designName, location, date , timeframe, pricerange } = req.body;
+    const { designName, location, date, timeframe, pricerange } = req.body;
 
     try {
-        console.log(`Updating Interior Design with ID: ${id}`);
+        console.log(`Updating Glatt Design with ID: ${id}`);
         
-        // Find the interior design by ID
-        const interiorDesign = await InteriorDesign.findById(id);
-        if (!interiorDesign) {
-            return res.status(404).json({ message: 'Interior design not found' });
+        // Find the Glatt design by ID
+        const glattDesign = await GlattEstate.findById(id);
+        if (!glattDesign) {
+            return res.status(404).json({ message: 'Glatt design not found' });
         }
 
         // If new images are uploaded, process them
         if (req.files && req.files.length > 0) {
             // Delete existing images from Cloudinary
-            if (interiorDesign.images && interiorDesign.images.length > 0) {
-                await Promise.all(interiorDesign.images.map(async (image) => {
+            if (glattDesign.images && glattDesign.images.length > 0) {
+                await Promise.all(glattDesign.images.map(async (image) => {
                     await cloudinary.uploader.destroy(image.cloudinary_id);
                 }));
             }
@@ -116,7 +116,7 @@ const updateInteriorDesign = async (req, res) => {
 
                 // Upload the compressed image to Cloudinary
                 const result = await cloudinary.uploader.upload(compressedImagePath, {
-                    folder: "interiorDesign",
+                    folder: "glattDesign",
                     use_filename: true,
                     unique_filename: false,
                     timeout: 120000
@@ -130,59 +130,59 @@ const updateInteriorDesign = async (req, res) => {
             }));
 
             // Update the images field with the new upload results
-            interiorDesign.images = uploadResults;
+            glattDesign.images = uploadResults;
         }
 
         // Update other fields
-        interiorDesign.designName = designName || interiorDesign.designName;
-        interiorDesign.location = location || interiorDesign.location;
-        interiorDesign.date = date || interiorDesign.date;
-        interiorDesign.timeframe = timeframe || interiorDesign.timeframe;
-        interiorDesign.pricerange = pricerange || interiorDesign.pricerange;
+        glattDesign.designName = designName || glattDesign.designName;
+        glattDesign.location = location || glattDesign.location;
+        glattDesign.date = date || glattDesign.date;
+        glattDesign.timeframe = timeframe || glattDesign.timeframe;
+        glattDesign.pricerange = pricerange || glattDesign.pricerange;
 
-        // Save the updated interior design to the database
-        const updatedInteriorDesign = await interiorDesign.save();
-        res.status(200).json(updatedInteriorDesign);
+        // Save the updated Glatt design to the database
+        const updatedGlattDesign = await glattDesign.save();
+        res.status(200).json(updatedGlattDesign);
         console.log("Successfully updated");
 
     } catch (error) {
-        console.error("Error updating the interior design:", error);
-        res.status(500).json({ message: 'An error occurred while updating the interior design', error: error.message });
+        console.error("Error updating the Glatt design:", error);
+        res.status(500).json({ message: 'An error occurred while updating the Glatt design', error: error.message });
     }
 };
 
-// Delete an interior design
-const deleteInteriorDesign = async (req, res) => {
+// Delete a Glatt design
+const deleteGlattDesign = async (req, res) => {
     const { id } = req.params;
-    console.log(`Deleting Interior Design with ID: ${id}`);
+    console.log(`Deleting Glatt Design with ID: ${id}`);
     
     try {
-        // Find the interior design by ID
-        const interiorDesign = await InteriorDesign.findById(id);
-        if (!interiorDesign) {
-            return res.status(404).json({ message: 'Interior design not found' });
+        // Find the Glatt design by ID
+        const glattDesign = await GlattEstate.findById(id);
+        if (!glattDesign) {
+            return res.status(404).json({ message: 'Glatt design not found' });
         }
            
         // Delete existing images from Cloudinary
-        if (interiorDesign.images && interiorDesign.images.length > 0) {
-            await Promise.all(interiorDesign.images.map(async (image) => {
+        if (glattDesign.images && glattDesign.images.length > 0) {
+            await Promise.all(glattDesign.images.map(async (image) => {
                 await cloudinary.uploader.destroy(image.cloudinary_id);
             }));
         }
 
-        // Delete the interior design from the database
-        await InteriorDesign.findByIdAndDelete(id);
+        // Delete the Glatt design from the database
+        await GlattEstate.findByIdAndDelete(id);
 
-        res.status(200).json({ message: 'Interior design deleted successfully' });
+        res.status(200).json({ message: 'Glatt design deleted successfully' });
     } catch (error) {
-        console.error("Error while deleting interior design:", error);
-        res.status(500).json({ message: 'An error occurred while deleting the interior design', error: error.message });
+        console.error("Error while deleting Glatt design:", error);
+        res.status(500).json({ message: 'An error occurred while deleting the Glatt design', error: error.message });
     }
 };
 
 module.exports = {
-    getAllInteriorDesigns,
-    createInteriorDesign,
-    updateInteriorDesign,
-    deleteInteriorDesign,
+    getAllGlattDesigns,
+    createGlattDesign,
+    updateGlattDesign,
+    deleteGlattDesign,
 };

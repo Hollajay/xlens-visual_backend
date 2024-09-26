@@ -1,7 +1,9 @@
-const InteriorDesign = require("../../Models/projectModel").InteriorDesign;
+
+const burumEstate = require("../../Models/estateModels").Burums
 const cloudinary = require("../../Utils/cloudinary");
 const sharp = require("sharp");
 const { encode } = require("blurhash");
+
 
 // Function to generate Blurhash
 const generateBlurhash = async (imagePath) => {
@@ -15,17 +17,17 @@ const generateBlurhash = async (imagePath) => {
 };
 
 // Get all interior designs
-const getAllInteriorDesigns = async (req, res) => {
+const getAllBurumsDesign = async (req, res) => {
     try {
-        const interiorDesigns = await InteriorDesign.find();
-        res.status(200).json(interiorDesigns);
+        const BurumEstate = await burumEstate.find();
+        res.status(200).json(BurumEstate);
     } catch (error) {
-        res.status(500).json({ message: 'An error occurred while fetching interior designs', error: error.message });
+        res.status(500).json({ message: 'An error occurred while fetching burums designs', error: error.message });
     }
 };
 
 // Create a new interior design
-const createInteriorDesign = async (req, res) => {
+const createBurumsDesign = async (req, res) => {
     try {
         // Compress and upload each file to Cloudinary
         console.log(req.files);
@@ -58,7 +60,7 @@ const createInteriorDesign = async (req, res) => {
         }));
 
         // Create a new interior design document
-        let newInteriorDesign = new InteriorDesign({
+        let newBurumsDesign = new burumEstate({
             designName: req.body.designName,
             location: req.body.location,
             date: req.body.date,
@@ -68,9 +70,9 @@ const createInteriorDesign = async (req, res) => {
         });
 
         // Save the document to the database
-        await newInteriorDesign.save();
-        res.status(200).json(newInteriorDesign);
-        console.log(newInteriorDesign);
+        await newBurumsDesign.save();
+        res.status(200).json(newBurumsDesign);
+        console.log(newBurumsDesign);
 
     } catch (error) {
         console.error("Error uploading to Cloudinary:", error);
@@ -79,7 +81,7 @@ const createInteriorDesign = async (req, res) => {
 };
 
 // Update an existing interior design
-const updateInteriorDesign = async (req, res) => {
+const updateBurumEstate = async (req, res) => {
     const { id } = req.params;
     const { designName, location, date , timeframe, pricerange } = req.body;
 
@@ -87,16 +89,16 @@ const updateInteriorDesign = async (req, res) => {
         console.log(`Updating Interior Design with ID: ${id}`);
         
         // Find the interior design by ID
-        const interiorDesign = await InteriorDesign.findById(id);
-        if (!interiorDesign) {
-            return res.status(404).json({ message: 'Interior design not found' });
+        const BurumEstate = await burumEstate.findById(id);
+        if (!BurumEstate) {
+            return res.status(404).json({ message: 'burum design  not found' });
         }
 
         // If new images are uploaded, process them
         if (req.files && req.files.length > 0) {
             // Delete existing images from Cloudinary
-            if (interiorDesign.images && interiorDesign.images.length > 0) {
-                await Promise.all(interiorDesign.images.map(async (image) => {
+            if (BurumEstate.images && BurumEstate.images.length > 0) {
+                await Promise.all(BurumEstate.images.map(async (image) => {
                     await cloudinary.uploader.destroy(image.cloudinary_id);
                 }));
             }
@@ -116,7 +118,7 @@ const updateInteriorDesign = async (req, res) => {
 
                 // Upload the compressed image to Cloudinary
                 const result = await cloudinary.uploader.upload(compressedImagePath, {
-                    folder: "interiorDesign",
+                    folder: "burumEstateDesign",
                     use_filename: true,
                     unique_filename: false,
                     timeout: 120000
@@ -130,59 +132,59 @@ const updateInteriorDesign = async (req, res) => {
             }));
 
             // Update the images field with the new upload results
-            interiorDesign.images = uploadResults;
+            BurumEstate.images = uploadResults;
         }
 
         // Update other fields
-        interiorDesign.designName = designName || interiorDesign.designName;
-        interiorDesign.location = location || interiorDesign.location;
-        interiorDesign.date = date || interiorDesign.date;
-        interiorDesign.timeframe = timeframe || interiorDesign.timeframe;
-        interiorDesign.pricerange = pricerange || interiorDesign.pricerange;
+        BurumEstate.designName = designName ||  BurumEstate.designName;
+        BurumEstate.location = location ||  BurumEstate.location;
+        BurumEstate.date = date ||  BurumEstate.date;
+        BurumEstate.timeframe = timeframe || BurumEstate.timeframe;
+        BurumEstate.pricerange = pricerange ||  BurumEstate.pricerange;
 
         // Save the updated interior design to the database
-        const updatedInteriorDesign = await interiorDesign.save();
-        res.status(200).json(updatedInteriorDesign);
+        const updatedBurumEstate = await  BurumEstate.save();
+        res.status(200).json(updatedBurumEstate);
         console.log("Successfully updated");
 
     } catch (error) {
-        console.error("Error updating the interior design:", error);
-        res.status(500).json({ message: 'An error occurred while updating the interior design', error: error.message });
+        console.error("Error updating the burums design:", error);
+        res.status(500).json({ message: 'An error occurred while updating the burums  design', error: error.message });
     }
 };
 
 // Delete an interior design
-const deleteInteriorDesign = async (req, res) => {
+const deleteBurumEstate = async (req, res) => {
     const { id } = req.params;
     console.log(`Deleting Interior Design with ID: ${id}`);
     
     try {
         // Find the interior design by ID
-        const interiorDesign = await InteriorDesign.findById(id);
-        if (!interiorDesign) {
-            return res.status(404).json({ message: 'Interior design not found' });
+        const  BurumEstateDesign = await burumEstate.findById(id);
+        if (!BurumEstateDesign) {
+            return res.status(404).json({ message: 'burums design not found' });
         }
            
         // Delete existing images from Cloudinary
-        if (interiorDesign.images && interiorDesign.images.length > 0) {
-            await Promise.all(interiorDesign.images.map(async (image) => {
+        if ( BurumEstateDesign.images &&  BurumEstateDesign.images.length > 0) {
+            await Promise.all( BurumEstateDesign.images.map(async (image) => {
                 await cloudinary.uploader.destroy(image.cloudinary_id);
             }));
         }
 
         // Delete the interior design from the database
-        await InteriorDesign.findByIdAndDelete(id);
+        await  burumEstate.findByIdAndDelete(id);
 
-        res.status(200).json({ message: 'Interior design deleted successfully' });
+        res.status(200).json({ message: 'burums design deleted successfully' });
     } catch (error) {
-        console.error("Error while deleting interior design:", error);
-        res.status(500).json({ message: 'An error occurred while deleting the interior design', error: error.message });
+        console.error("Error while deleting burums design:", error);
+        res.status(500).json({ message: 'An error occurred while deleting the burums design', error: error.message });
     }
 };
 
 module.exports = {
-    getAllInteriorDesigns,
-    createInteriorDesign,
-    updateInteriorDesign,
-    deleteInteriorDesign,
+   getAllBurumsDesign,
+   createBurumsDesign,
+   updateBurumEstate,
+   deleteBurumEstate
 };
