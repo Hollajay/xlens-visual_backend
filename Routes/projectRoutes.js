@@ -14,7 +14,7 @@ const { getAllVisualization3Ds, createVisualization3D, updateVisualization3D, de
 router.get("/floorplans", getAllFloorPlans);
 router.post("/floorplans", upload,createFloorPlan);
 router.put("/floorplans/:id", updateFloorPlan);
-router.delete("/floorplans/:id",deleteFloorPlan)
+router.delete("/floorplans/:id",deleteFloorPlan);
 
 
 // InteriorDesign routes

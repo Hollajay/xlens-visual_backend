@@ -13,16 +13,16 @@ router.put("/burums/:id",updateBurumEstate);
 router.delete("/burums/:id",deleteBurumEstate);
 
 
-router.get("glattEstate", getAllGlattDesigns);
-router.post("/glatttEstate",upload,createGlattDesign);
+router.get("/glattEstate", getAllGlattDesigns);
+router.post("/glattEstate",upload,createGlattDesign);
 router.put("/glattEstate/:id",updateGlattDesign);
 router.delete("/glattEstate/:id",deleteGlattDesign);
 
 
-router.get("/glattEstate", getAllItunuDesigns);
-router.post("/glattEstate",upload,createItunuDesign);
-router.put('/glattEstate', updateItunuDesign);
-router.delete("glattEstate",deleteItunuDesign);
+router.get("/itunuDesign", getAllItunuDesigns);
+router.post("/itunuDesign",upload,createItunuDesign);
+router.put('/itunuDesign', updateItunuDesign);
+router.delete("/itunuDesign",deleteItunuDesign);
 
 
 module.exports = router
