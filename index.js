@@ -1,8 +1,9 @@
 const express = require("express");
-const mongoose = require("mongoose")
-const projectRoutes = require("./Routes/projectRoutes")
-const feedbackRoutes = require("./Routes/feedbackRoutes")
-const estateRoutes = require("./Routes/estateRoute")
+const mongoose = require("mongoose");
+const projectRoutes = require("./Routes/projectRoutes");
+const feedbackRoutes = require("./Routes/feedbackRoutes");
+const estateRoutes = require("./Routes/estateRoute");
+const subscribeRoutes = require("./Routes/subscriberRoute");
 const cors = require('cors');
 const App = express();
 const PORT = 5000;
@@ -25,8 +26,9 @@ App.use(cors({
 })
 
 App.use("/api/projects", projectRoutes);
-App.use("/api",feedbackRoutes)
-App.use("/api/projects/",estateRoutes)
+App.use("/api",feedbackRoutes);
+App.use("/api",subscribeRoutes);
+App.use("/api/projects/",estateRoutes);
 
 
 

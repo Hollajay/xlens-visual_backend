@@ -7,7 +7,6 @@ const feedbackController  = async (req, res) => {
 
   try {
     if (!fullname || !email || !message) {
-        console.log(fullname,email,message);
       return res.status(400).json('All fields must be filled'); 
       
     }
@@ -17,18 +16,33 @@ const feedbackController  = async (req, res) => {
     // Email options for notifying yourself
     const notifyOptions = {
       from: process.env.EMAIL,
-      subject: `New message from ${fullname}`,
+      subject: `New Message from ${fullname}`,
       email_to: process.env.EMAIL,
-      body_message: `<p>You have received a new message:</p><p><strong>From:</strong> ${fullname}</p><p><strong>Email:</strong> ${email}</p><p><strong>Message:</strong><br>${message}</p>`
+      body_message: `
+        <p>Hello,</p>
+        <p>You have received a new message from the contact form:</p>
+        <p><strong>Name:</strong> ${fullname}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong><br>${message}</p>
+        <p>Please review and respond to the inquiry as soon as possible.</p>
+        <p>Best regards,<br/>Your Website Team</p>
+      `
     };
+    
 
     // Email options for confirming to the user
     const confirmOptions = {
       from: process.env.EMAIL,
-      subject: 'Thank you for your message',
+      subject: 'Thank You for Your Message',
       email_to: email,
-      body_message: `<p>Dear ${fullname},</p><p>Thank you for your message. We will get back to you shortly.</p>`
+      body_message: `
+        <p>Dear ${fullname},</p>
+        <p>Thank you for reaching out to us. We have received your message and will get back to you as soon as possible.</p>
+        <p>We appreciate your interest and look forward to assisting you.</p>
+        <p>Best regards,<br/>The Xlens visualization Team</p>
+      `
     };
+    
 
     // Send notification email to yourself
     await sendMail(notifyOptions);
